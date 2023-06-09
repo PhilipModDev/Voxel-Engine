@@ -6,26 +6,32 @@ import com.badlogic.gdx.utils.Disposable;
 import com.dawnfall.engine.Client.MainRenderer;
 import com.dawnfall.engine.Client.features.DebugProperties.Debug;
 import com.dawnfall.engine.Client.features.OptionsProperties.Options;
-import com.dawnfall.engine.rendering.shaders.lighting;
+import com.dawnfall.engine.rendering.shaders.EngineLighting;
 
 public class WorldRenderer implements Disposable {
+    /*
+     *World Renderer renders the world.
+     */
     private World world;
     private ModelBatch batch;
-    private lighting lighting;
+    private EngineLighting lighting;
     private final boolean gen;
     public WorldRenderer(boolean gen) {
         if (gen){
             Gdx.app.log("World", "Loading world");
-            lighting = new lighting();
+            lighting = new EngineLighting();
             batch = new ModelBatch();
             world = new World(true);
         }
         this.gen = gen;
     }
-    public void renderWorld() {
+    /*
+     * Starts the Rendering process.
+     */
+    public void initializeWorld() {
         if (gen) {
             try {
-                world.blockEdit.update();
+                world.updateRayCast();
                 batch.begin(MainRenderer.player.getPlayer());
                 batch.render(world.chunks, lighting.environment);
                 batch.render(Debug.showXYZLine());
@@ -35,9 +41,8 @@ public class WorldRenderer implements Disposable {
                 Gdx.app.error("Chunks Load", Options.NetworkResource.name() +" Renderer is overloading");
             }
             world.update();
-      }
+        }
     }
-
     @Override
     public void dispose() {
         batch.dispose();

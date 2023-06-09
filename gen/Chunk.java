@@ -3,7 +3,7 @@ package com.dawnfall.engine.gen;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.dawnfall.engine.gen.Blocks.BlockRegister;
-
+import com.dawnfall.engine.util.BlockPos;
 
 public class Chunk {
     public static final Vector3 size = new Vector3(16,256,16);
@@ -23,51 +23,29 @@ public class Chunk {
         //Builds the voxel chunk.
         blockData = new byte[(int) size.x][(int) size.y][(int) size.z];
     }
+    public Chunk(BlockPos coordinates) {
+        chunkCoordinates = new Vector2(coordinates.x,coordinates.y);
+        //Builds the voxel chunk.
+        blockData = new byte[(int) size.x][(int) size.y][(int) size.z];
+    }
     public byte getBlock(int x, int y, int z) {
-        if (x < 0 || y < 0 || z < 0 || x > 15 || y > 255|| z > 15)
-            return BlockRegister.AIR;
+        if (x < 0 || x >= Chunk.size.x) return BlockRegister.AIR;
+        if (y < 0 || y >= Chunk.size.y) return BlockRegister.AIR;
+        if (z < 0 || z >= Chunk.size.z) return BlockRegister.AIR;
 
         return blockData[x][y][z];
     }
 
     public boolean isAtBorder(int x, int y, int z){
-        return x <= 0 || y <= 0 || z <= 0 || x >= 15 || y >= 255 || z >= 15;
-    }
-    public ChunkSides getChunkSide(int x, int y, int z){
-       if (z-1 == -1){
-           return ChunkSides.BACK;
-       }
-       if (z+1 == size.y){
-           return ChunkSides.FRONT;
-       }
-       if (x+1 == size.y){
-           return ChunkSides.RIGHT;
-       }
-       if (x-1 == -1){
-           return ChunkSides.LEFT;
-       }
-       if (y+1 == size.y){
-           return ChunkSides.TOP;
-       }
-       return ChunkSides.BOTTOM;
+        if (x < 0 || x >= Chunk.size.x) return true;
+        if (y < 0 || y >= Chunk.size.y) return true;
+        return z < 0 || z >= Chunk.size.z;
     }
     public void setBlock(int x, int y, int z, byte ID) {
-        if (x < 0 || y < 0 || z < 0 || x > 15 || y > 15 || z > 15)
-            return;
-
+        if (x < 0 || x >= Chunk.size.x) return;
+        if (y < 0 || y >= Chunk.size.y) return;
+        if (z < 0 || z >= Chunk.size.z) return;
         blockData[x][y][z] = ID;
-    }
-    public void clear() {
-        for (int x = 0; x < size.x; x++)
-        {
-            for (int y = 0; y < size.y; y++)
-            {
-                for (int z = 0; z < size.z; z++)
-                {
-                    blockData[x][y][z] = BlockRegister.AIR;
-                }
-            }
-        }
     }
     public byte[][][] getBlockData() {
         return blockData;
@@ -85,10 +63,6 @@ public class Chunk {
         return isNewChunk;
     }
     public void setData(byte[][][] blockData) {
-        this.blockData = blockData;
-    }
-
-    public void setBlockData(byte[][][] blockData) {
         this.blockData = blockData;
     }
 }

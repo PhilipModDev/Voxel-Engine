@@ -27,7 +27,6 @@ public class Debug {
     public static void setRenderDebugMode(boolean isDebugMode, PerspectiveCamera camera, MainGame client){
 
         if (isDebugMode){
-            Runtime runtime = Runtime.getRuntime();
             isDebugOn = true;
             int x = Math.round(camera.position.x);
             int y = Math.round(camera.position.y);

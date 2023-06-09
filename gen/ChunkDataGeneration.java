@@ -8,7 +8,6 @@ import com.dawnfall.engine.util.math.perlinNoise.OpenSimplex2S;
 public class ChunkDataGeneration {
     private final ChunkManager chunkManager;
     public boolean Terminate;
-    private Vector2 coordinates;
     private final GenerationProperties generationProperties;
     public ChunkDataGeneration(ChunkManager chunkManager) {
         this.chunkManager = chunkManager;
@@ -20,7 +19,6 @@ public class ChunkDataGeneration {
                 ChunkManager.dataSize = chunkManager.ChunkData.size();
                 return chunkManager.ChunkData.get(coordinates);
             }
-            this.coordinates = coordinates;
 
             Vector2 NorthCoordinates = new Vector2(coordinates.x, coordinates.y + 1);
             Vector2 SouthCoordinates = new Vector2(coordinates.x, coordinates.y - 1);

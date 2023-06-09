@@ -17,23 +17,23 @@ public class ChunkMeshBuffer {
     }
     public void addToChunkBuffer(HashMap<Vector2,ModelInstance> chunks){
         buffer.clear();
-        Set<Map.Entry<Vector2, ModelInstance>> chunkSet = chunks.entrySet();
-        for (Map.Entry<Vector2, ModelInstance> instanceEntry : chunkSet) {
-            buffer.add(instanceEntry.getValue());
-        }
-        ChunkManager.setProcessedChunks(1);
+        try {
+            Set<Map.Entry<Vector2, ModelInstance>> chunkSet = chunks.entrySet();
+            for (Map.Entry<Vector2, ModelInstance> instanceEntry : chunkSet) {
+                buffer.add(instanceEntry.getValue());
+            }
+            ChunkManager.setProcessedChunks(1);
+        }catch (Exception ignored){}
     }
     public void updateBuffer(){
         try {
-            // FIXME: 6/5/2023 Update the worker thread.
-           ChunkBuilder chunkBuilder = chunkManager.BuiltChunks.poll();
-           if (chunkBuilder != null) {
-               chunkBuilder.end();
-               ChunkManager.setProcessedChunks(1);
-           } else {
-               chunkManager.updateWorkerThread = true;
-       }
-
+            ChunkBuilder chunkBuilder = chunkManager.BuiltChunks.poll();
+            if (chunkBuilder != null) {
+                chunkBuilder.end();
+                ChunkManager.setProcessedChunks(1);
+            } else {
+                chunkManager.updateWorkerThread = true;
+            }
         }catch (Exception exception){
             exception.printStackTrace();
             chunkManager.updateWorkerThread = false;

@@ -5,11 +5,8 @@ import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g3d.*;
-import com.badlogic.gdx.math.Vector3;
 import com.dawnfall.engine.Blocknet.Client.ClientProtocol;
 import com.dawnfall.engine.Client.features.BundleLoader;
-import com.dawnfall.engine.GameTest.GUI.WindowValue;
-import com.dawnfall.engine.GameTest.GUI.window;
 import com.dawnfall.engine.Client.features.CursorProperties.DefaultCursor;
 import com.dawnfall.engine.Client.features.DebugProperties.Debug;
 import com.dawnfall.engine.Client.features.OptionsProperties.Options;
@@ -20,18 +17,16 @@ import com.dawnfall.engine.handle.events.EventAdapter;
 import com.dawnfall.engine.handle.events.EventRegister;
 import com.dawnfall.engine.handle.events.ServerPortEvent;
 import com.dawnfall.engine.handle.events.TickEvent;
-import com.dawnfall.engine.mesh.block.BlockScene;
 import com.dawnfall.engine.rendering.BoxRenderer;
 import com.dawnfall.engine.rendering.shaders.ShaderResource;
-import com.dawnfall.engine.rendering.shaders.lighting;
+import com.dawnfall.engine.rendering.shaders.EngineLighting;
 
 //Main Game loop.
 public class MainGame implements Screen {
     public ModelBatch batch;
-    public static lighting light;
+    public static EngineLighting light;
     private DefaultCursor defaultCursor;
     public BitmapFont fpsFont;
-    private BlockScene blockScene;
     public WorldRenderer worldRenderer;
     public static ShaderResource shader;
     private InputUpdater updater;
@@ -55,12 +50,10 @@ public class MainGame implements Screen {
         fpsFont = new BitmapFont();
         defaultCursor = new DefaultCursor();
         //Creates the lighting for the game.
-        light = new lighting();
+        light = new EngineLighting();
         light.lightingFog();
         //Create the model batch.
         batch = new ModelBatch();
-
-        blockScene = new BlockScene("blocks/dark_slate.png",new Vector3(16,16,16));
 
         worldRenderer = new WorldRenderer(true);
         Debug.enableRenderDebug();
@@ -89,7 +82,7 @@ public class MainGame implements Screen {
         BundleLoader.LoadEvents();
     }
     public void renderTerrain(){
-        worldRenderer.renderWorld();
+        worldRenderer.initializeWorld();
         Debug.setRenderDebugMode(true, MainRenderer.player.getPlayer(),this);
     }
     @Override
@@ -104,7 +97,6 @@ public class MainGame implements Screen {
            MainRenderer.fitViewport.update(width, height, true);
        }
     }
-
     @Override
     public void pause() {}
     @Override

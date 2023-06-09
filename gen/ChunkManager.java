@@ -6,7 +6,7 @@ import com.dawnfall.engine.Blocknet.Client.ClientProtocol;
 import com.dawnfall.engine.Client.MainRenderer;
 import com.dawnfall.engine.entity.Player;
 import com.dawnfall.engine.gen.multithread.ChunkBuilder;
-import com.dawnfall.engine.gen.multithread.LaunchMultithreadingApplication;
+import com.dawnfall.engine.gen.multithread.ChunkBuilderThread;
 import com.dawnfall.engine.gen.World.World;
 import com.dawnfall.engine.mesh.ChunkMeshBuffer;
 import com.dawnfall.engine.util.libUtil;
@@ -28,7 +28,7 @@ public class ChunkManager {
     public static Vector2 playerCoordinates;
     private boolean update;
     public boolean updateWorkerThread;
-    public LaunchMultithreadingApplication application;
+    public ChunkBuilderThread chunkBuilderThread;
     private static int processedChunks = 0;
     public static  int dirty = 0;
     public static int dirtyChunksProcess = 0;
@@ -36,12 +36,11 @@ public class ChunkManager {
     public byte[][][] SouthChunk;
     public byte[][][] EastChunk;
     public byte[][][] WestChunk;
+
     public ChunkMeshBuffer buffer;
-    public ChunkRegion chunkRegion;
     public ChunkDataGeneration dataGeneration;
 
     public ChunkManager(World world) {
-        chunkRegion = new ChunkRegion(world,this,World.WORLD_SIZE);
         //Create a new instance of the collections.
         ChunkData = new ConcurrentHashMap<>();
         LoadedChunks = new HashMap<>();
@@ -50,8 +49,9 @@ public class ChunkManager {
         this.player = MainRenderer.player;
         clientProtocol = new ClientProtocol(3838);
         dataGeneration = new ChunkDataGeneration(this);
-        application = new LaunchMultithreadingApplication(this);
-        application.Launch();
+
+        chunkBuilderThread = new ChunkBuilderThread(this);
+        new Thread(chunkBuilderThread).start();
         buffer = new ChunkMeshBuffer(this);
     }
     public void updateBuffer() {
@@ -82,15 +82,9 @@ public class ChunkManager {
             int playerChunkX = (int) ((int) player.getPlayerPosX() / Chunk.size.x);
             int playerChunkY = (int) ((int) player.getPlayerPosZ() / Chunk.size.z);
             CoordinatesToRemove.clear();
-            ChunkManager.playerCoordinates = chunkRegion.getChunkAtPlayer();
+            ChunkManager.playerCoordinates = world.getChunkAtPlayer();
             //Adds the coordinates to remove the old chunks.
-
-//            Set<Map.Entry<Vector2,byte[][][]>> chunkSet = ChunkData.entrySet();
-//            for (Map.Entry<Vector2,byte[][][]> chunk : chunkSet){
-//                CoordinatesToRemove.add(chunk.getKey());
-//            }
             CoordinatesToRemove.addAll(ActiveChunks);
-
             //Is used to create new chunks before removal.
             for (int x = playerChunkX - renderDistance; x <= playerChunkX + renderDistance; x++) {
                 for (int y = playerChunkY - renderDistance; y <= playerChunkY +renderDistance; y++) {
@@ -151,7 +145,7 @@ public class ChunkManager {
 public void updatePos(){
     try {
         //Gets the players chunk coordinates position.
-        ChunkManager.playerCoordinates = chunkRegion.getChunkAtPlayer();
+        ChunkManager.playerCoordinates = world.getChunkAtPlayer();
                 //Check if it is a loaded chunk.
                 if (!checkLoadedChunks(playerCoordinates)) {
                     if (ChunkData.containsKey(playerCoordinates)) {
