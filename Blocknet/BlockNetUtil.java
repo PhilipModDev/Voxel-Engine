@@ -1,5 +1,6 @@
 package com.dawnfall.engine.Blocknet;
 
+import io.github.pixee.security.ObjectInputFilters;
 import java.io.*;
 import java.nio.ByteBuffer;
 import java.util.zip.Deflater;
@@ -189,6 +190,7 @@ public abstract class BlockNetUtil implements NetUtil {
     public Object deserializer(byte[] data){
         try(ByteArrayInputStream bytesInputStream = new ByteArrayInputStream(data)) {
             try(ObjectInputStream inputStream = new ObjectInputStream(bytesInputStream)) {
+                ObjectInputFilters.enableObjectFilterIfUnprotected(inputStream);
                 return inputStream.readObject();
             }catch (Exception exception){
                 exception.printStackTrace();
