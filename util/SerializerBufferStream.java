@@ -1,5 +1,6 @@
 package com.dawnfall.engine.util;
 
+import io.github.pixee.security.ObjectInputFilters;
 import java.io.*;
 
 public class SerializerBufferStream {
@@ -20,7 +21,8 @@ public class SerializerBufferStream {
         try(ByteArrayInputStream b = new ByteArrayInputStream(bytes)){
             //Puts the ByteArrayInputStream into the ObjectInputStream.
             try(ObjectInputStream o = new ObjectInputStream(b)){
-                //Reads the ByteArrayInputStream and returns the data.
+                
+                ObjectInputFilters.enableObjectFilterIfUnprotected(o);
                 return o.readObject();
             }
         }
